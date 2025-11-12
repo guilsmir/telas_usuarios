@@ -7,7 +7,13 @@ import interactionPlugin from "@fullcalendar/interaction";
 import bootstrapPlugin from "@fullcalendar/bootstrap5";
 import ptBr from "@fullcalendar/core/locales/pt-br";
 
-export default function Calendario() {
+interface CalendarioProps {
+  onCreate?: () => void;
+  selectedPeople?: string[];
+  selectedRooms?: string[];
+}
+
+export default function Calendario({ onCreate, selectedPeople = [], selectedRooms = [] }: CalendarioProps) {
   const calendarRef = useRef<any>(null);
 
   const handleDateClick = (info: any) => {
@@ -29,7 +35,7 @@ export default function Calendario() {
       headerToolbar={{
         left: "prev,next today",
         center: "title",
-        right: "dayGridMonth,timeGridWeek,timeGridDay,semester",
+        right: "dayGridMonth,timeGridWeek,timeGridDay,semester myCustomButton",
       }}
       views={{
         semester: {
@@ -38,18 +44,22 @@ export default function Calendario() {
           buttonText: "Semestre",
         },
       }}
-      height="auto"
-      selectable={true}
+      height="100%"
+      selectable={false}
       dateClick={handleDateClick}
       editable={false}
       themeSystem="bootstrap5"
-      events={[
-        { id: "a", title: "my event", start: "2025-09-01" },
-      ]}
+      events={[{ id: "a", title: "my event", start: "2025-09-01" }]}
       weekNumbers={false}
       navLinks={false}
       nowIndicator={true}
       locale={ptBr}
+      customButtons={{
+        myCustomButton: {
+          text: "Criar Reserva",
+          click: () => onCreate?.(),
+        },
+      }}
     />
   );
 }
