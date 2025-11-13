@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 
-// Tipos
+// Tipos (Manter aqui por consistência)
 export type Person = {
   id: string;
   name: string;
-  grade: string; // série / turma
-  avatar?: string; // url opcional
+  grade: string;
+  avatar?: string;
 };
 
 export type Room = {
@@ -16,13 +16,7 @@ export type Room = {
 export type SidebarFiltersProps = {
   people?: Person[];
   rooms?: Room[];
-  /**
-   * Callback chamado sempre que a seleção muda. Recebe arrays de ids selecionados.
-   */
   onSelectionChange?: (selectedPeopleIds: string[], selectedRoomIds: string[]) => void;
-  /**
-   * Altura máxima do sidebar (ex.: 'calc(100vh - 120px)') — por padrão 540px.
-   */
   maxHeight?: string;
 };
 
@@ -39,7 +33,17 @@ export default function SidebarFilters({
   const [selectedPeople, setSelectedPeople] = useState<Record<string, boolean>>(() => ({}));
   const [selectedRooms, setSelectedRooms] = useState<Record<string, boolean>>(() => ({}));
 
-  // Filtragens memoizadas
+  const isMounted = useRef(false);
+
+  const selectedPeopleMap = useMemo(() => {
+    return people.filter(p => selectedPeople[p.id]).map(p => ({ id: p.id, name: p.name }));
+  }, [people, selectedPeople]);
+
+  const selectedRoomsMap = useMemo(() => {
+    return rooms.filter(r => selectedRooms[r.id]).map(r => ({ id: r.id, name: r.name }));
+  }, [rooms, selectedRooms]);
+
+
   const filteredPeople = useMemo(() => {
     const q = peopleQuery.trim().toLowerCase();
     if (!q) return people;
@@ -52,14 +56,20 @@ export default function SidebarFilters({
     return rooms.filter((r) => r.name.toLowerCase().includes(q));
   }, [rooms, roomsQuery]);
 
-  // Efeito para notificar mudança de seleção automaticamente
+  // Efeito para notificar mudança de seleção automaticamente (com prevenção de loop)
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
+
     const peopleIds = Object.keys(selectedPeople).filter((id) => selectedPeople[id]);
     const roomIds = Object.keys(selectedRooms).filter((id) => selectedRooms[id]);
+    
     onSelectionChange?.(peopleIds, roomIds);
   }, [selectedPeople, selectedRooms, onSelectionChange]);
 
-  // Helpers
+  // Helpers (toggle functions)
   const togglePerson = (id: string) => {
     setSelectedPeople((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -75,47 +85,168 @@ export default function SidebarFilters({
     setRoomsQuery("");
   };
 
+  // Funções de Desseleção por ID (usadas nos chips)
+  const deselectPerson = (id: string) => {
+    setSelectedPeople((prev) => ({ ...prev, [id]: false }));
+  };
+  const deselectRoom = (id: string) => {
+    setSelectedRooms((prev) => ({ ...prev, [id]: false }));
+  };
+
   return (
-    <div className="p-3" style={{ maxHeight, overflow: "auto"}}>
-      <div className="mb-3">
-        <label className="form-label">Pessoas</label>
-        <input className="form-control mb-2" placeholder="Buscar pessoas..." value={peopleQuery} onChange={(e) => setPeopleQuery(e.target.value)} />
-        <div>
+    <div className="d-flex flex-column h-100 p-3" style={{ maxHeight }}>
+      
+      {/* People Header & Search (flex-shrink-0) */}
+      <div className="mb-3 flex-shrink-0">
+        <label className="form-label text-primary fw-bold mb-1">Pessoas</label>
+        
+        <div className="d-flex align-items-center mb-2">
+            <input 
+                className="form-control form-control-sm" 
+                placeholder="Buscar pessoas..." 
+                value={peopleQuery} 
+                onChange={(e) => setPeopleQuery(e.target.value)} 
+            />
+        </div>
+
+        {/* INDICADOR DE SELEÇÃO VISÍVEL (CHIPS) */}
+        {selectedPeopleMap.length > 0 && (
+            <div className="mt-2 mb-2 d-flex flex-wrap gap-1 border p-2 rounded bg-light w-100 overflow-hidden">
+                <span className="text-secondary small me-1 flex-shrink-0">Selecionados:</span>
+                {selectedPeopleMap.map(item => (
+                    // Chip com botão de remoção e correção de overflow
+                    <span 
+                        key={item.id} 
+                        // Corrigido para text-secondary
+                        className="badge bg-primary-subtle text-secondary d-flex align-items-center" 
+                        style={{ maxWidth: '50%' }} // Limita a largura total do chip
+                    >
+                        {/* Garante que o nome encolhe/trunca, priorizando o botão 'x' */}
+                        <span className="text-truncate flex-shrink-1 me-1" style={{ minWidth: 0 }}>
+                            {item.name}
+                        </span>
+                        <button 
+                            type="button" 
+                            className="btn-close btn-close-white ms-1 flex-shrink-0" // Não encolhe
+                            aria-label="Remover"
+                            onClick={() => deselectPerson(item.id)}
+                            style={{ width: '0.45em', height: '0.45em', filter: 'brightness(0.6)' }}
+                        ></button>
+                    </span>
+                ))}
+            </div>
+        )}
+      </div>
+
+      {/* People List: Scrollable Area (Divisão 50/50 e rolagem oculta) */}
+      <div 
+        className="flex-grow-1 overflow-auto border-bottom pb-3 mb-3 custom-scrollbar-hide" 
+        style={{ minHeight: '0', height: '50%' }}
+      >
+          <div className="list-group list-group-flush">
           {filteredPeople.map((p) => (
-            <div key={p.id} className="form-check">
-              <input className="form-check-input" type="checkbox" id={`person-${p.id}`} checked={!!selectedPeople[p.id]} onChange={() => togglePerson(p.id)} />
-              <label className="form-check-label" htmlFor={`person-${p.id}`}>
-                {p.name} <small className="text-muted">({p.grade})</small>
-              </label>
+            <div 
+                key={p.id} 
+                // ESTÉTICA FINAL: Borda arredondada e espessa. Sem mudança de cor de fundo/texto.
+                className={`list-group-item list-group-item-action d-flex align-items-center ${selectedPeople[p.id] ? 'border border-primary rounded border-2 p-3 my-1' : 'border-0 p-3 my-1'}`}
+                onClick={() => togglePerson(p.id)}
+                style={{ cursor: 'pointer' }}
+            >
+                {/* Avatar: Nenhuma mudança de cor */}
+                <div 
+                    className={`rounded-circle d-flex justify-content-center align-items-center me-3 bg-secondary text-white`}
+                    style={{ width: '40px', height: '40px', flexShrink: 0 }}
+                >
+                    {p.avatar ? <img src={p.avatar} alt={p.name} className="w-100 h-100 rounded-circle" /> : p.name.charAt(0)}
+                </div>
+
+                {/* TRUNCAMENTO DE TEXTO: Garante que o nome/grau caibam sem estourar */}
+                <div className="flex-grow-1 me-2 overflow-hidden">
+                    <div className="fw-bold text-dark text-truncate">{p.name}</div>
+                    <small className={`text-muted d-block text-truncate`}>{p.grade}</small>
+                </div>
+                
+                {/* Ícone de Checkbox: Única mudança de cor, para Primário (azul) */}
+                <i className={`bi ms-2 ${selectedPeople[p.id] ? 'bi-check-circle-fill text-primary' : 'bi-circle'}`}></i>
             </div>
           ))}
-          {filteredPeople.length === 0 && <div className="text-muted">Nenhuma pessoa encontrada</div>}
+          {filteredPeople.length === 0 && <div className="text-muted p-2">Nenhuma pessoa encontrada</div>}
         </div>
       </div>
 
-      <hr />
+      {/* Rooms Header & Search (flex-shrink-0) */}
+      <div className="mb-3 flex-shrink-0">
+        <label className="form-label text-primary fw-bold mb-1">Salas</label>
+        
+        <div className="d-flex align-items-center mb-2">
+            <input 
+                className="form-control form-control-sm" 
+                placeholder="Buscar salas..." 
+                value={roomsQuery} 
+                onChange={(e) => setRoomsQuery(e.target.value)} 
+            />
+        </div>
+        
+        {/* INDICADOR DE SELEÇÃO VISÍVEL (CHIPS) */}
+        {selectedRoomsMap.length > 0 && (
+            <div className="mt-2 mb-2 d-flex flex-wrap gap-1 border p-2 rounded bg-light w-100 overflow-hidden">
+                <span className="text-secondary small me-1 flex-shrink-0">Selecionadas:</span>
+                {selectedRoomsMap.map(item => (
+                    // Chip com botão de remoção e correção de overflow
+                    <span 
+                        key={item.id} 
+                        // Corrigido para text-secondary
+                        className="badge bg-primary-subtle text-secondary d-flex align-items-center"
+                        style={{ maxWidth: '50%' }}
+                    >
+                        {/* Garante que o nome encolhe/trunca, priorizando o botão 'x' */}
+                        <span className="text-truncate flex-shrink-1 me-1" style={{ minWidth: 0 }}>
+                            {item.name}
+                        </span>
+                        <button 
+                            type="button" 
+                            className="btn-close btn-close-white ms-1 flex-shrink-0"
+                            aria-label="Remover"
+                            onClick={() => deselectRoom(item.id)}
+                            style={{ width: '0.45em', height: '0.45em', filter: 'brightness(0.6)' }}
+                        ></button>
+                    </span>
+                ))}
+            </div>
+        )}
+      </div>
 
-      <div className="mb-3">
-        <label className="form-label">Salas</label>
-        <input className="form-control mb-2" placeholder="Buscar salas..." value={roomsQuery} onChange={(e) => setRoomsQuery(e.target.value)} />
-        <div>
+      {/* Rooms List: Scrollable Area (Divisão 50/50 e rolagem oculta) */}
+      <div 
+        className="flex-grow-1 overflow-auto mb-3 custom-scrollbar-hide"
+        style={{ minHeight: '0', height: '50%' }}
+      >
+        <div className="list-group list-group-flush">
           {filteredRooms.map((r) => (
-            <div key={r.id} className="form-check">
-              <input className="form-check-input" type="checkbox" id={`room-${r.id}`} checked={!!selectedRooms[r.id]} onChange={() => toggleRoom(r.id)} />
-              <label className="form-check-label" htmlFor={`room-${r.id}`}>
-                {r.name}
-              </label>
+            <div 
+                key={r.id} 
+                // ESTÉTICA FINAL: Borda arredondada e espessa. Sem mudança de cor de fundo/texto.
+                className={`list-group-item list-group-item-action d-flex align-items-center ${selectedRooms[r.id] ? 'border border-primary rounded border-2 p-3 my-1' : 'border-0 p-3 my-1'}`}
+                onClick={() => toggleRoom(r.id)}
+                style={{ cursor: 'pointer' }}
+            >
+                <i className={`bi bi-door-open me-3 fs-5 ${selectedRooms[r.id] ? 'text-primary' : 'text-secondary'}`}></i>
+                {/* TRUNCAMENTO DE TEXTO E COR DE TEXTO CONSTANTE */}
+                <div className={`flex-grow-1 fw-bold text-dark text-truncate`}>{r.name}</div>
+                
+                {/* Ícone de Checkbox: Única mudança de cor, para Primário (azul) */}
+                <i className={`bi ms-2 ${selectedRooms[r.id] ? 'bi-check-circle-fill text-primary' : 'bi-circle'}`}></i>
             </div>
           ))}
-          {filteredRooms.length === 0 && <div className="text-muted">Nenhuma sala encontrada</div>}
+          {filteredRooms.length === 0 && <div className="text-muted p-2">Nenhuma sala encontrada</div>}
         </div>
       </div>
 
-      <div className="d-flex justify-content-between">
+      {/* Footer / Controls (apenas o botão Limpar Filtros) */}
+      <div className="d-flex justify-content-end pt-2 border-top flex-shrink-0">
         <button type="button" className="btn btn-sm btn-outline-secondary" onClick={clearAll}>
-          Limpar
+          <i className="bi bi-x-circle me-1"></i> Limpar Filtros
         </button>
-        <small className="text-muted align-self-center">Total pessoas: {people.length} • Salas: {rooms.length}</small>
       </div>
     </div>
   );

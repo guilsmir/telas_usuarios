@@ -1,39 +1,56 @@
 // src/App.tsx
-import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css"; // remova se já importar em main.tsx
-import "bootstrap-icons/font/bootstrap-icons.css"; // ícones bootstrap (bi)
+import React, { useState, useCallback } from "react";
+import "bootstrap/dist/css/bootstrap.min.css"; 
+import "bootstrap-icons/font/bootstrap-icons.css"; 
 import "./App.css";
 
 import Calendario from "./Componentes/Calendario";
-import ModalReserva from "./Componentes/ModalReserva";
-import type { ReservationData } from "./Componentes/ModalReserva";
+import ModalReserva, { type ReservationData, type Person, type Room } from "./Componentes/ModalReserva";
 import SidebarFilters from "./Componentes/SidebarFilters";
-import type { Person, Room } from "./Componentes/SidebarFilters";
 
 function App() {
   const [show, setShow] = useState(false);
+  const [lastReservation, setLastReservation] = useState<ReservationData | null>(null);
 
-  const handleSubmit = (data: ReservationData) => {
-    console.log("Reserva criada:", data);
+  const handleReservationSubmit = (data: ReservationData) => {
+    console.log("Dados de Reserva Submetidos:", data);
+    setLastReservation(data);
+    alert('Reserva submetida com sucesso! (Verifique o console para os dados completos)');
   };
 
   const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
 
-  const handleSelectionChange = (people: string[], rooms: string[]) => {
+  // CORREÇÃO: Estabilizar a função com useCallback
+  const handleSelectionChange = useCallback((people: string[], rooms: string[]) => {
     setSelectedPeople(people);
     setSelectedRooms(rooms);
     console.log("Selected filters:", { people, rooms });
-    // Aqui você pode chamar a lógica que filtra o FullCalendar por pessoas/salas
-  };
+  }, []); 
 
   // Exemplo de dados (substitua pelo fetch / props reais)
-  const people: Person[] = [
-    { id: "p1", name: "Ana Silva", grade: "3ª série", avatar: "https://i.pravatar.cc/40?img=32" },
-    { id: "p2", name: "Bruno Pereira", grade: "2ª série", avatar: "https://i.pravatar.cc/40?img=5" },
-    { id: "p3", name: "Carla Melo", grade: "1º ano kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk", avatar: "https://i.pravatar.cc/40?img=12" },
-    { id: "p4", name: "Diego Rodrigues", grade: "3º ano", avatar: "https://i.pravatar.cc/40?img=7" },
-  ];
+  const mockPeople: Person[] = [
+  { id: 'p1', name: 'Ana Silva', email: 'ana.silva@empresa.com.br', grade: 'Gerente' },
+  { id: 'p2', name: 'Bruno Costa', email: 'bruno.costa@empresa.com.br', grade: 'Analista Sênior' },
+  { id: 'p3', name: 'Carla Dias', email: 'carla.dias@empresa.com.br', grade: 'Estagiária' },
+  { id: 'p4', name: 'Felipe Rocha', email: 'felipe.rocha@empresa.com.br', grade: 'Diretor' },
+  { id: 'p5', name: 'Juliana Martins', email: 'juliana.martins@empresa.com.br', grade: 'Coordenadora' },
+  { id: 'p6', name: 'Ricardo Lima', email: 'ricardo.lima@empresa.com.br', grade: 'Analista Pleno' },
+  { id: 'p7', name: 'Mariana Ferreira', email: 'mariana.ferreira@empresa.com.br', grade: 'Gerente de Projetos' },
+  { id: 'p8', name: 'Lucas Almeida', email: 'lucas.almeida@empresa.com.br', grade: 'Analista Júnior' },
+  { id: 'p9', name: 'Paula Barbosa', email: 'paula.barbosa@empresa.com.br', grade: 'Supervisora' },
+  { id: 'p10', name: 'Gustavo Nunes', email: 'gustavo.nunes@empresa.com.br', grade: 'Diretor de Operações' },
+  { id: 'p11', name: 'Fernanda Oliveira', email: 'fernanda.oliveira@empresa.com.br', grade: 'Analista de RH' },
+  { id: 'p12', name: 'Rafael Santos', email: 'rafael.santos@empresa.com.br', grade: 'Coordenador Técnico' },
+  { id: 'p13', name: 'Beatriz Mendes', email: 'beatriz.mendes@empresa.com.br', grade: 'Gerente de Marketing' },
+  { id: 'p14', name: 'Thiago Ribeiro', email: 'thiago.ribeiro@empresa.com.br', grade: 'Estagiário' },
+  { id: 'p15', name: 'Camila Lopes', email: 'camila.lopes@empresa.com.br', grade: 'Supervisora de Vendas' },
+  { id: 'p16', name: 'Eduardo Pereira', email: 'eduardo.pereira@empresa.com.br', grade: 'Analista de Sistemas' },
+  { id: 'p17', name: 'Sofia Carvalho', email: 'sofia.carvalho@empresa.com.br', grade: 'Assistente Administrativa' },
+  { id: 'p18', name: 'João Figueiredo', email: 'joao.figueiredo@empresa.com.br', grade: 'Gerente de TI' },
+  { id: 'p19', name: 'Patrícia Azevedo', email: 'patricia.azevedo@empresa.com.br', grade: 'Coordenadora de Projetos' },
+  { id: 'p20', name: 'André Gonçalves', email: 'andre.goncalves@empresa.com.br', grade: 'Diretor Financeiro' }
+]
 
   const rooms: Room[] = [
     { id: "r1", name: "Laboratório de Informática" },
@@ -44,7 +61,13 @@ function App() {
 
   return (
     <>
-      <ModalReserva show={show} onClose={() => setShow(false)} onSubmit={handleSubmit} />
+      <ModalReserva
+        show={show}
+        onClose={() => setShow(false)}
+        onSubmit={handleReservationSubmit}
+        people={mockPeople}
+        rooms={rooms}
+      />
 
       {/* full viewport height container */}
       <div className="container-fluid vh-100">
@@ -52,28 +75,20 @@ function App() {
           {/* Sidebar */}
           <div className="col-12 col-md-4 col-lg-3 border-end p-0">
             <SidebarFilters
-              people={people}
+              people={mockPeople}
               rooms={rooms}
               onSelectionChange={handleSelectionChange}
-              // opcional: SidebarFilters pode aplicar esse valor como style
               maxHeight="calc(100vh - 0px)"
             />
           </div>
 
           {/* Main area (calendar) */}
-          {/* Use flex column so we can let the inner wrapper grow and allow FullCalendar to size to 100% */}
           <main className="col p-3 d-flex flex-column">
-            {/* 
-              Important: set minHeight: 0 on the flex child so overflow works correctly
-              (prevents children from overflowing the flex container on some browsers).
-            */}
             <div className="flex-grow-1" style={{ minHeight: 0 }}>
-              {/* Pass props if needed. Calendario must render with height: 100% */}
               <Calendario
                 onCreate={() => setShow(true)}
                 selectedPeople={selectedPeople}
                 selectedRooms={selectedRooms}
-                // If Calendario expects styles/props add them here
               />
             </div>
           </main>
