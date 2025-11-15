@@ -1,18 +1,70 @@
-/* src/App.css */
 html, body, #root {
   height: 100%;
   margin: 0;
+  width: 100%;
+  overflow-x: hidden; 
 }
 
 .container-fluid, .row.h-100 {
   height: 100%;
 }
 
-/* Opcional: ajustar overflow do sidebar-scrollable caso queira customizações */
 .sidebar-scrollable {
   box-sizing: border-box;
   padding: 1rem;
   height: 100%;
   overflow-y: auto;
   background: #fff;
+}
+
+.custom-scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.custom-scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.fc-timegrid-now-indicator,
+.fc-now-indicator {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+}
+
+.fc-daygrid-now-indicator {
+  background-color: var(--bs-primary) !important;
+}
+
+
+.selected-day {
+  background-color: #D6E9FF !important; 
+  border-color: transparent !important;
+}
+
+.fc-timegrid-col.selected-day {
+  background-color: rgba(214, 233, 255, 0.6) !important; /* Light blue w/ transparency */
+}
+
+.fc-day-today {
+  border-color: transparent !important;
+}
+
+.fc-day-today:not(.selected-day) {
+    background-color: transparent !important;
+}
+
+.fc-daygrid-day.selected-day .fc-daygrid-day-number,
+.fc-timegrid-col.selected-day .fc-timegrid-slot-label {
+  color: inherit;
+}
+
+
+.fc-scroller {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+}
+
+.fc-scroller::-webkit-scrollbar {
+  display: none;
 }
