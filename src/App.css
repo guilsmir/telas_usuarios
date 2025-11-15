@@ -1,18 +1,14 @@
-/* src/App.css */
 html, body, #root {
   height: 100%;
   margin: 0;
-  /* --- LAYOUT FIX --- */
   width: 100%;
   overflow-x: hidden; 
-  /* --- END LAYOUT FIX --- */
 }
 
 .container-fluid, .row.h-100 {
   height: 100%;
 }
 
-/* Opcional: ajustar overflow do sidebar-scrollable caso queira customizações */
 .sidebar-scrollable {
   box-sizing: border-box;
   padding: 1rem;
@@ -21,71 +17,54 @@ html, body, #root {
   background: #fff;
 }
 
-/* Oculta a barra de rolagem para IE e Edge */
 .custom-scrollbar-hide {
   -ms-overflow-style: none;
-  /* Oculta a barra de rolagem para Firefox */
   scrollbar-width: none;
 }
 
-/* Oculta a barra de rolagem para Chrome, Safari e Opera */
 .custom-scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-/* Time-grid "now" line (BLUE: var(--bs-primary)) */
 .fc-timegrid-now-indicator,
 .fc-now-indicator {
   background-color: var(--bs-primary) !important;
   border-color: var(--bs-primary) !important;
 }
 
-/* For month/grid views that have an "now" indicator element */
 .fc-daygrid-now-indicator {
   background-color: var(--bs-primary) !important;
 }
 
-/* --- LIGHT BLUE HIGHLIGHT FOR CURRENT DAY (TODAY) --- */
 
-/* Selected day style (LIGHT BLUE: #D6E9FF) - Applies to day grid cells */
 .selected-day {
   background-color: #D6E9FF !important; 
   border-color: transparent !important;
 }
 
-/* Selected day for timeGrid column (makes column visibly lighter) */
 .fc-timegrid-col.selected-day {
   background-color: rgba(214, 233, 255, 0.6) !important; /* Light blue w/ transparency */
 }
 
-/* Ensure default FullCalendar/Bootstrap styles don't conflict */
 .fc-day-today {
-  /* Set border to transparent so our background-color shows clearly */
   border-color: transparent !important;
 }
 
-/* Remove default background for current day in general grid to ensure our .selected-day takes over */
 .fc-day-today:not(.selected-day) {
     background-color: transparent !important;
 }
 
-/* Ensure the number color is correct */
 .fc-daygrid-day.selected-day .fc-daygrid-day-number,
 .fc-timegrid-col.selected-day .fc-timegrid-slot-label {
   color: inherit;
 }
 
-/* --- SCROLLBAR HIDING FOR CALENDAR --- */
 
-/* FullCalendar scrollable container */
 .fc-scroller {
-  /* Oculta a barra de rolagem para IE e Edge */
   -ms-overflow-style: none; 
-  /* Oculta a barra de rolagem para Firefox */
   scrollbar-width: none;
 }
 
-/* Oculta a barra de rolagem para Chrome, Safari e Opera */
 .fc-scroller::-webkit-scrollbar {
   display: none;
 }
