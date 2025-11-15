@@ -63,7 +63,6 @@ function RegisterPage({ onGoToLogin }: RegisterPageProps) {
                   required
                 />
               </div>
-
               <div className="register-input-group">
                 <i className="bi bi-envelope"></i>
                 <input
@@ -74,7 +73,6 @@ function RegisterPage({ onGoToLogin }: RegisterPageProps) {
                   required
                 />
               </div>
-
               <div className="register-input-group">
                 <i className="bi bi-lock"></i>
                 <input
@@ -85,7 +83,6 @@ function RegisterPage({ onGoToLogin }: RegisterPageProps) {
                   required
                 />
               </div>
-
               <button type="submit" className="auth-button secondary register">
                 CADASTRAR
               </button>

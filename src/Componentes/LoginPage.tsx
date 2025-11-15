@@ -32,7 +32,6 @@ function LoginPage({ onLoginSuccess, onGoToRegister }: LoginPageProps) {
         <div className="auth-header">
           <h2>Login</h2>
         </div>
-
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-input-group">
             <label htmlFor="email">Email</label>
