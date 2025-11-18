@@ -1,4 +1,3 @@
-// src/App.tsx
 import { useState, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -26,7 +25,12 @@ import SolicitacoesPage from "./Componentes/SolicitacoesPage";
 import SidebarLayout from "./Componentes/SidebarLayout";
 
 import { type MenuLink } from "./types/api";
+
+// [MERGE] Import vindo do GitHub (Nova tela de Usuários)
 import UsuariosPage from "./Componentes/UsuariosPage";
+
+// [MERGE] Import vindo da sua versão Local (Tela de Configurações)
+import SettingsPage from "./Componentes/SettingsPage";
 
 // ===================================================================
 //  COMPONENTE: Calendário com filtros (rota "/")
@@ -147,18 +151,16 @@ function CalendarioPage({
 //  APP PRINCIPAL + LOGIN + ROTAS DO SISTEMA
 // ===================================================================
 export default function App() {
-  //  Mantém login salvo no navegador
+  // Mantém login salvo no navegador
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isLogged") === "true"
   );
 
-  //  Primeira tela deve ser o REGISTRO
-  const [currentPage, setCurrentPage] = useState<"login" | "register">(
-    "register"
-  );
+  // [CORREÇÃO] Primeira tela deve ser o LOGIN (não registro) quando deslogado
+  const [currentPage, setCurrentPage] = useState<"login" | "register">("login");
 
   // ===================================================================
-  //  DADOS MOCKADOS
+  //  DADOS MOCKADOS (Unificados)
   // ===================================================================
   const mockPeople: Person[] = [
     {
@@ -186,36 +188,52 @@ export default function App() {
     { id: "r2", name: "Auditório" },
   ];
 
-  // Menu lateral
+  // ===================================================================
+  //  MENU LATERAL (Unificado: Itens Padrão + Usuários + Configurações)
+  // ===================================================================
   const adminMenuItems: MenuLink[] = [
     { path: "/", label: "Calendário", icon: "bi-calendar-date" },
     { path: "/solicitacoes", label: "Solicitações", icon: "bi-inbox" },
+    // Item vindo do GitHub
     { path: "/usuarios", label: "Usuários", icon: "bi-people" },
     {
       path: "/auditoria",
       label: "Registros de Auditoria",
       icon: "bi-journal-check",
     },
+    // Item vindo da sua versão Local
+    {
+      path: "/configuracoes",
+      label: "Configurações",
+      icon: "bi-gear",
+    },
   ];
 
   // ===================================================================
-  //  FLUXO DE AUTENTICAÇÃO
+  //  LÓGICA DE LOGOUT (Da sua versão Local)
+  // ===================================================================
+  const handleLogout = () => {
+    localStorage.removeItem("isLogged");
+    setIsAuthenticated(false);
+    // Retorna para login automaticamente devido à mudança de estado
+  };
+
+  // ===================================================================
+  //  FLUXO DE AUTENTICAÇÃO (Login / Registro)
   // ===================================================================
   if (!isAuthenticated) {
-    // Tela de LOGIN
     if (currentPage === "login") {
       return (
         <LoginPage
           onLoginSuccess={() => {
-            localStorage.setItem("isLogged", "true"); // salva login
-            setIsAuthenticated(true); // entra no sistema
+            localStorage.setItem("isLogged", "true");
+            setIsAuthenticated(true);
           }}
           onGoToRegister={() => setCurrentPage("register")}
         />
       );
     }
 
-    // Tela de REGISTRO
     if (currentPage === "register") {
       return (
         <RegisterPage
@@ -228,20 +246,33 @@ export default function App() {
   }
 
   // ===================================================================
-  //  USUÁRIO LOGADO → ACESSA ROTAS DO SISTEMA
+  //  USUÁRIO LOGADO -> ROTAS DO SISTEMA
   // ===================================================================
   return (
     <Router>
       <Routes>
+        {/* Layout com Sidebar contendo o menu unificado */}
         <Route element={<SidebarLayout menuItems={adminMenuItems} />}>
+          {/* Rota Principal: Calendário */}
           <Route
             path="/"
             element={<CalendarioPage people={mockPeople} rooms={rooms} />}
           />
+
+          {/* Rota de Solicitações */}
           <Route path="/solicitacoes" element={<SolicitacoesPage />} />
+
+          {/* Rota de Auditoria */}
           <Route path="/auditoria" element={<AuditPage />} />
+
+          {/* [MERGE] Rota de Usuários (Vinda do GitHub) */}
           <Route path="/usuarios" element={<UsuariosPage />} />
-          
+
+          {/* [MERGE] Rota de Configurações (Sua versão Local) */}
+          <Route
+            path="/configuracoes"
+            element={<SettingsPage onLogout={handleLogout} />}
+          />
         </Route>
       </Routes>
     </Router>

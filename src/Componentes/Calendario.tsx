@@ -20,39 +20,53 @@ interface CalendarioProps {
 
 const initialEvents = [
   {
-    id: 'e1',
-    title: 'Reunião - Sala 101',
-    start: '2025-11-18T09:00:00',
-    end: '2025-11-18T10:30:00',
-    color: '#3A86FF',
+    id: "e1",
+    title: "Reunião - Sala 101",
+    start: "2025-11-18T09:00:00",
+    end: "2025-11-18T10:30:00",
+    color: "#3A86FF",
     extendedProps: {
       reservation: {
-        nome: 'Reunião',
-        email: 'pessoa@u.edu',
-        descricao: 'Discussão',
+        nome: "Reunião",
+        email: "pessoa@u.edu",
+        descricao: "Discussão",
         schedules: [
-          { id: 's1', roomId: 'r1', roomName: 'Sala 101', data: '2025-11-18', horaInicio: '09:00', horaFim: '10:30' }
-        ]
-      }
-    }
+          {
+            id: "s1",
+            roomId: "r1",
+            roomName: "Sala 101",
+            data: "2025-11-18",
+            horaInicio: "09:00",
+            horaFim: "10:30",
+          },
+        ],
+      },
+    },
   },
   {
-    id: 'e2',
-    title: 'Aula - Auditório',
-    start: '2025-11-19T14:00:00',
-    end: '2025-11-19T16:00:00',
-    color: '#FF9F1C',
+    id: "e2",
+    title: "Aula - Auditório",
+    start: "2025-11-19T14:00:00",
+    end: "2025-11-19T16:00:00",
+    color: "#FF9F1C",
     extendedProps: {
       reservation: {
-        nome: 'Aula',
-        email: 'prof@u.edu',
-        descricao: 'Seminário',
+        nome: "Aula",
+        email: "prof@u.edu",
+        descricao: "Seminário",
         schedules: [
-          { id: 's2', roomId: 'r2', roomName: 'Auditório', data: '2025-11-19', horaInicio: '14:00', horaFim: '16:00' }
-        ]
-      }
-    }
-  }
+          {
+            id: "s2",
+            roomId: "r2",
+            roomName: "Auditório",
+            data: "2025-11-19",
+            horaInicio: "14:00",
+            horaFim: "16:00",
+          },
+        ],
+      },
+    },
+  },
 ];
 
 export default function Calendario({
@@ -87,21 +101,24 @@ export default function Calendario({
 
   const handleEventClick = (clickInfo: any) => {
     const ev = clickInfo.event;
-    const reservation = ev.extendedProps && ev.extendedProps.reservation ? ev.extendedProps.reservation : null;
+    const reservation =
+      ev.extendedProps && ev.extendedProps.reservation
+        ? ev.extendedProps.reservation
+        : null;
     const maybeSchedule = reservation?.schedules?.[0] ?? {
-      data: ev.start ? ev.start.toISOString().split('T')[0] : undefined,
-      horaInicio: ev.start ? ev.start.toTimeString().slice(0,5) : undefined,
-      horaFim: ev.end ? ev.end.toTimeString().slice(0,5) : undefined,
-      roomName: ev.title ?? '',
+      data: ev.start ? ev.start.toISOString().split("T")[0] : undefined,
+      horaInicio: ev.start ? ev.start.toTimeString().slice(0, 5) : undefined,
+      horaFim: ev.end ? ev.end.toTimeString().slice(0, 5) : undefined,
+      roomName: ev.title ?? "",
       roomId: undefined,
       id: undefined,
-      recorrencia: 'nao',
+      recorrencia: "nao",
       intervaloRecorrencia: 1,
-      unidadeRecorrencia: 'dias',
+      unidadeRecorrencia: "dias",
       diasSemana: [],
-      recurrenceEnd: 'never',
+      recurrenceEnd: "never",
       occurrences: 1,
-      recurrenceEndDate: '',
+      recurrenceEndDate: "",
     };
 
     const payload = {
@@ -133,12 +150,20 @@ export default function Calendario({
     if (!calApi) return;
     const ev = calApi.getEventById(updatedEvent.id);
     if (ev) {
-      if (updatedEvent.title !== undefined) ev.setProp("title", updatedEvent.title);
+      if (updatedEvent.title !== undefined)
+        ev.setProp("title", updatedEvent.title);
       if (updatedEvent.start !== undefined) ev.setStart(updatedEvent.start);
       if (updatedEvent.end !== undefined) ev.setEnd(updatedEvent.end);
-      if (updatedEvent.color !== undefined) ev.setProp("backgroundColor", updatedEvent.color);
-      if (updatedEvent.extendedProps && updatedEvent.extendedProps.reservation !== undefined) {
-        ev.setExtendedProp("reservation", updatedEvent.extendedProps.reservation);
+      if (updatedEvent.color !== undefined)
+        ev.setProp("backgroundColor", updatedEvent.color);
+      if (
+        updatedEvent.extendedProps &&
+        updatedEvent.extendedProps.reservation !== undefined
+      ) {
+        ev.setExtendedProp(
+          "reservation",
+          updatedEvent.extendedProps.reservation
+        );
       }
     } else {
       try {
@@ -215,7 +240,14 @@ export default function Calendario({
     <>
       <FullCalendar
         ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, multiMonthPlugin, listPlugin, interactionPlugin, bootstrapPlugin]}
+        plugins={[
+          dayGridPlugin,
+          timeGridPlugin,
+          multiMonthPlugin,
+          listPlugin,
+          interactionPlugin,
+          bootstrapPlugin,
+        ]}
         themeSystem="bootstrap5"
         initialView="dayGridMonth"
         locales={[ptBr]}
@@ -224,7 +256,8 @@ export default function Calendario({
         headerToolbar={{
           left: "prev,next today createReserve",
           center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth,semesterButton"
+          right:
+            "dayGridMonth,timeGridWeek,timeGridDay,listMonth,semesterButton",
         }}
         customButtons={{
           createReserve: {
@@ -236,7 +269,7 @@ export default function Calendario({
                 const calApi = (calendarRef.current as any)?.getApi?.();
                 calApi?.changeView?.("timeGridDay");
               }
-            }
+            },
           },
           semesterButton: {
             text: "Semestre",
@@ -248,16 +281,16 @@ export default function Calendario({
               } catch (e) {
                 calApi.changeView("multiMonth", { duration: { months: 6 } });
               }
-            }
-          }
+            },
+          },
         }}
         views={{
           semester: {
             type: "multiMonth",
             duration: { months: 6 },
             buttonText: "Semestre",
-            multiMonthMaxColumns: 3
-          }
+            multiMonthMaxColumns: 3,
+          },
         }}
         editable={false}
         selectable={true}

@@ -30,7 +30,6 @@ function RegisterPage({ onGoToLogin }: RegisterPageProps) {
   return (
     <div className="register-page-wrapper">
       <div className="register-container">
-
         <div className="register-panel left-panel">
           <h2>Bem-Vindo de volta</h2>
           <p>Acesse sua conta agora mesmo</p>
@@ -89,7 +88,6 @@ function RegisterPage({ onGoToLogin }: RegisterPageProps) {
             </form>
           </div>
         </div>
-
       </div>
     </div>
   );

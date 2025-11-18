@@ -18,23 +18,23 @@ export default function SidebarLayout({ menuItems }: SidebarLayoutProps) {
   const { pathname } = useLocation();
 
   // Função que intercepta clique nos itens do menu
-const handleMenuClick = (
-  e: MouseEvent<HTMLAnchorElement>,
-  itemPath: string
-) => {
-  const calendarPath = "/";
+  const handleMenuClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    itemPath: string
+  ) => {
+    const calendarPath = "/";
 
-  // Se sair do calendário, força recarregamento
-  if (pathname === calendarPath && itemPath !== calendarPath) {
-    e.preventDefault();
+    // Se sair do calendário, força recarregamento
+    if (pathname === calendarPath && itemPath !== calendarPath) {
+      e.preventDefault();
 
-    // Evita flash de tela e garante redirecionamento suave
-    setTimeout(() => {
-      window.location.href = itemPath;
-    }, 0);
+      // Evita flash de tela e garante redirecionamento suave
+      setTimeout(() => {
+        window.location.href = itemPath;
+      }, 0);
 
-    return;
-  }
+      return;
+    }
     // Caso contrário, deixamos o NavLink controlar a navegação (SPA)
     // Não chamamos preventDefault()
   };
