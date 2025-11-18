@@ -1,7 +1,7 @@
 // src/Componentes/AuditPage.tsx
 // Este ficheiro implementa a página de auditoria com filtros e tabela de resultados.
 
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 // =================================================================
 // 1. TIPOS E INTERFACES (Consolidados)

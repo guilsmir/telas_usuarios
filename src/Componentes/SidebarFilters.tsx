@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 export type Person = {
   id: string;
   name: string;
-  grade: string;
+  grade?: string;
   avatar?: string;
 };
 
@@ -58,7 +58,8 @@ export default function SidebarFilters({
     if (!q) return people;
     return people.filter(
       (p) =>
-        p.name.toLowerCase().includes(q) || p.grade.toLowerCase().includes(q)
+        p.name.toLowerCase().includes(q) ||
+        (p.grade ?? "").toLowerCase().includes(q)
     );
   }, [people, peopleQuery]);
 

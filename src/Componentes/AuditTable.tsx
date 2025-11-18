@@ -1,5 +1,5 @@
 // src/components/AuditTable.tsx
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 export type AuditEntry = {
   id: string;

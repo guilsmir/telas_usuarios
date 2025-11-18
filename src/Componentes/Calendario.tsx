@@ -1,5 +1,5 @@
 // src/Componentes/Calendario.tsx
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
