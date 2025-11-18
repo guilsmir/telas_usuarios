@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 
-// Tipos (Manter aqui por consistência)
 export type Person = {
   id: string;
   name: string;
@@ -69,7 +68,6 @@ export default function SidebarFilters({
     onSelectionChange?.(peopleIds, roomIds);
   }, [selectedPeople, selectedRooms, onSelectionChange]);
 
-  // Helpers (toggle functions)
   const togglePerson = (id: string) => {
     setSelectedPeople((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -96,7 +94,6 @@ export default function SidebarFilters({
   return (
     <div className="d-flex flex-column h-100 p-3" style={{ maxHeight }}>
       
-      {/* People Header & Search (flex-shrink-0) */}
       <div className="mb-3 flex-shrink-0">
         <label className="form-label text-primary fw-bold mb-1">Pessoas</label>
         
@@ -109,25 +106,21 @@ export default function SidebarFilters({
             />
         </div>
 
-        {/* INDICADOR DE SELEÇÃO VISÍVEL (CHIPS) */}
         {selectedPeopleMap.length > 0 && (
             <div className="mt-2 mb-2 d-flex flex-wrap gap-1 border p-2 rounded bg-light w-100 overflow-hidden">
                 <span className="text-secondary small me-1 flex-shrink-0">Selecionados:</span>
                 {selectedPeopleMap.map(item => (
-                    // Chip com botão de remoção e correção de overflow
                     <span 
                         key={item.id} 
-                        // Corrigido para text-secondary
                         className="badge bg-primary-subtle text-secondary d-flex align-items-center" 
-                        style={{ maxWidth: '50%' }} // Limita a largura total do chip
+                        style={{ maxWidth: '50%' }} 
                     >
-                        {/* Garante que o nome encolhe/trunca, priorizando o botão 'x' */}
                         <span className="text-truncate flex-shrink-1 me-1" style={{ minWidth: 0 }}>
                             {item.name}
                         </span>
                         <button 
                             type="button" 
-                            className="btn-close btn-close-white ms-1 flex-shrink-0" // Não encolhe
+                            className="btn-close btn-close-white ms-1 flex-shrink-0" 
                             aria-label="Remover"
                             onClick={() => deselectPerson(item.id)}
                             style={{ width: '0.45em', height: '0.45em', filter: 'brightness(0.6)' }}
@@ -138,7 +131,6 @@ export default function SidebarFilters({
         )}
       </div>
 
-      {/* People List: Scrollable Area (Divisão 50/50 e rolagem oculta) */}
       <div 
         className="flex-grow-1 overflow-auto border-bottom pb-3 mb-3 custom-scrollbar-hide" 
         style={{ minHeight: '0', height: '50%' }}
@@ -147,12 +139,10 @@ export default function SidebarFilters({
           {filteredPeople.map((p) => (
             <div 
                 key={p.id} 
-                // ESTÉTICA FINAL: Borda arredondada e espessa. Sem mudança de cor de fundo/texto.
                 className={`list-group-item list-group-item-action d-flex align-items-center ${selectedPeople[p.id] ? 'border border-primary rounded border-2 p-3 my-1' : 'border-0 p-3 my-1'}`}
                 onClick={() => togglePerson(p.id)}
                 style={{ cursor: 'pointer' }}
             >
-                {/* Avatar: Nenhuma mudança de cor */}
                 <div 
                     className={`rounded-circle d-flex justify-content-center align-items-center me-3 bg-secondary text-white`}
                     style={{ width: '40px', height: '40px', flexShrink: 0 }}
@@ -160,13 +150,11 @@ export default function SidebarFilters({
                     {p.avatar ? <img src={p.avatar} alt={p.name} className="w-100 h-100 rounded-circle" /> : p.name.charAt(0)}
                 </div>
 
-                {/* TRUNCAMENTO DE TEXTO: Garante que o nome/grau caibam sem estourar */}
                 <div className="flex-grow-1 me-2 overflow-hidden">
                     <div className="fw-bold text-dark text-truncate">{p.name}</div>
                     <small className={`text-muted d-block text-truncate`}>{p.grade}</small>
                 </div>
                 
-                {/* Ícone de Checkbox: Única mudança de cor, para Primário (azul) */}
                 <i className={`bi ms-2 ${selectedPeople[p.id] ? 'bi-check-circle-fill text-primary' : 'bi-circle'}`}></i>
             </div>
           ))}
@@ -174,7 +162,6 @@ export default function SidebarFilters({
         </div>
       </div>
 
-      {/* Rooms Header & Search (flex-shrink-0) */}
       <div className="mb-3 flex-shrink-0">
         <label className="form-label text-primary fw-bold mb-1">Salas</label>
         
@@ -187,19 +174,15 @@ export default function SidebarFilters({
             />
         </div>
         
-        {/* INDICADOR DE SELEÇÃO VISÍVEL (CHIPS) */}
         {selectedRoomsMap.length > 0 && (
             <div className="mt-2 mb-2 d-flex flex-wrap gap-1 border p-2 rounded bg-light w-100 overflow-hidden">
                 <span className="text-secondary small me-1 flex-shrink-0">Selecionadas:</span>
                 {selectedRoomsMap.map(item => (
-                    // Chip com botão de remoção e correção de overflow
                     <span 
                         key={item.id} 
-                        // Corrigido para text-secondary
                         className="badge bg-primary-subtle text-secondary d-flex align-items-center"
                         style={{ maxWidth: '50%' }}
                     >
-                        {/* Garante que o nome encolhe/trunca, priorizando o botão 'x' */}
                         <span className="text-truncate flex-shrink-1 me-1" style={{ minWidth: 0 }}>
                             {item.name}
                         </span>
@@ -216,7 +199,6 @@ export default function SidebarFilters({
         )}
       </div>
 
-      {/* Rooms List: Scrollable Area (Divisão 50/50 e rolagem oculta) */}
       <div 
         className="flex-grow-1 overflow-auto mb-3 custom-scrollbar-hide"
         style={{ minHeight: '0', height: '50%' }}
@@ -225,16 +207,13 @@ export default function SidebarFilters({
           {filteredRooms.map((r) => (
             <div 
                 key={r.id} 
-                // ESTÉTICA FINAL: Borda arredondada e espessa. Sem mudança de cor de fundo/texto.
                 className={`list-group-item list-group-item-action d-flex align-items-center ${selectedRooms[r.id] ? 'border border-primary rounded border-2 p-3 my-1' : 'border-0 p-3 my-1'}`}
                 onClick={() => toggleRoom(r.id)}
                 style={{ cursor: 'pointer' }}
             >
                 <i className={`bi bi-door-open me-3 fs-5 ${selectedRooms[r.id] ? 'text-primary' : 'text-secondary'}`}></i>
-                {/* TRUNCAMENTO DE TEXTO E COR DE TEXTO CONSTANTE */}
                 <div className={`flex-grow-1 fw-bold text-dark text-truncate`}>{r.name}</div>
                 
-                {/* Ícone de Checkbox: Única mudança de cor, para Primário (azul) */}
                 <i className={`bi ms-2 ${selectedRooms[r.id] ? 'bi-check-circle-fill text-primary' : 'bi-circle'}`}></i>
             </div>
           ))}
@@ -242,7 +221,6 @@ export default function SidebarFilters({
         </div>
       </div>
 
-      {/* Footer / Controls (apenas o botão Limpar Filtros) */}
       <div className="d-flex justify-content-end pt-2 border-top flex-shrink-0">
         <button type="button" className="btn btn-sm btn-outline-secondary" onClick={clearAll}>
           <i className="bi bi-x-circle me-1"></i> Limpar Filtros

@@ -26,6 +26,7 @@ import SolicitacoesPage from "./Componentes/SolicitacoesPage";
 import SidebarLayout from "./Componentes/SidebarLayout";
 
 import { type MenuLink } from "./types/api";
+import UsuariosPage from "./Componentes/UsuariosPage";
 
 // ===================================================================
 //  COMPONENTE: Calendário com filtros (rota "/")
@@ -239,20 +240,8 @@ export default function App() {
           />
           <Route path="/solicitacoes" element={<SolicitacoesPage />} />
           <Route path="/auditoria" element={<AuditPage />} />
-
-          <Route
-            path="/usuarios"
-            element={
-              <div className="p-4">
-                <h3 className="text-secondary">
-                  Gerência de Usuários (Em Breve)
-                </h3>
-                <p className="text-muted">
-                  Esta tela será implementada futuramente.
-                </p>
-              </div>
-            }
-          />
+          <Route path="/usuarios" element={<UsuariosPage />} />
+          
         </Route>
       </Routes>
     </Router>
