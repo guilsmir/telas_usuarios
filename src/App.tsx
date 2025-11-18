@@ -46,7 +46,15 @@ function CalendarioPage({
   const [lastReservation, setLastReservation] =
     useState<ReservationData | null>(null);
 
-  const [updatedEvent, setUpdatedEvent] = useState<any | null>(null);
+  // CORREÇÃO: Usar um tipo mais seguro do que 'any'
+  const [updatedEvent, setUpdatedEvent] = useState<{
+    id: string;
+    title: string;
+    start?: string;
+    end?: string;
+    extendedProps: { reservation: ReservationData };
+  } | null>(null);
+
   const [deletedEventId, setDeletedEventId] = useState<string | null>(null);
 
   const handleEventClick = useCallback(

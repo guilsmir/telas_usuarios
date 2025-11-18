@@ -93,7 +93,6 @@ export default function ModalReserva({
   show,
   onClose,
   onSubmit,
-  onDelete,
   people,
   rooms,
   initialData,
@@ -278,11 +277,6 @@ export default function ModalReserva({
       schedules,
     };
     onSubmit(payload);
-  };
-
-  const handleDelete = () => {
-    if (onDelete) onDelete(initialData?.id);
-    else onSubmit(null);
   };
 
   const isEditing = !!initialData?.id;
@@ -607,7 +601,6 @@ export default function ModalReserva({
                     >
                       {schedules.map((item) => {
                         const prefix = `sched-${item.roomId}`;
-                        const unidade = item.unidadeRecorrencia ?? "dias";
                         const recType = item.recorrencia ?? "nao";
                         const showExplicitWeekly = recType === "semanal";
 

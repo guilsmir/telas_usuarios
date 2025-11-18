@@ -18,7 +18,15 @@ function CalendarDashboard() {
     useState<ReservationData | null>(null);
 
   // These two states are used to instruct Calendario to update or delete an event
-  const [updatedEvent, setUpdatedEvent] = useState<any | null>(null);
+  // CORREÇÃO: Usar um tipo mais seguro do que 'any'
+  const [updatedEvent, setUpdatedEvent] = useState<{
+    id: string;
+    title: string;
+    start?: string;
+    end?: string;
+    extendedProps: { reservation: ReservationData };
+  } | null>(null);
+
   const [deletedEventId, setDeletedEventId] = useState<string | null>(null);
 
   // When an event is clicked in Calendario we receive a Reservation-like payload (may be partial).
