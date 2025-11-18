@@ -1,3 +1,4 @@
+// src/Componentes/LoginPage.tsx
 import React, { useState } from "react";
 
 type LoginPageProps = {
@@ -14,7 +15,12 @@ function LoginPage({ onLoginSuccess, onGoToRegister }: LoginPageProps) {
 
     if (email && password) {
       alert("Login simulado com sucesso!");
-      onLoginSuccess(); // Avisa o App.tsx que o login foi feito
+
+      // 🔥 SALVA LOGIN NO LOCALSTORAGE
+      localStorage.setItem("isLogged", "true");
+
+      // Avisamos ao App.tsx para mostrar o sistema
+      onLoginSuccess();
     } else {
       alert("Por favor, preencha o email e a password.");
     }
