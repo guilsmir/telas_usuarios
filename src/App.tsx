@@ -28,6 +28,7 @@ import { type MenuLink } from "./types/api";
 
 // [MERGE] Import vindo do GitHub (Nova tela de Usuários)
 import UsuariosPage from "./Componentes/UsuariosPage";
+import SalasPage from "./Componentes/SalasPage";
 
 // [MERGE] Import vindo da sua versão Local (Tela de Configurações)
 import SettingsPage from "./Componentes/SettingsPage";
@@ -204,6 +205,7 @@ export default function App() {
     { path: "/solicitacoes", label: "Solicitações", icon: "bi-inbox" },
     // Item vindo do GitHub
     { path: "/usuarios", label: "Usuários", icon: "bi-people" },
+    { path: "/salas", label: "Salas", icon: "bi-door-open" },
     {
       path: "/auditoria",
       label: "Registros de Auditoria",
@@ -275,6 +277,8 @@ export default function App() {
 
           {/* [MERGE] Rota de Usuários (Vinda do GitHub) */}
           <Route path="/usuarios" element={<UsuariosPage />} />
+          
+          <Route path="/salas" element={<SalasPage />} />
 
           {/* [MERGE] Rota de Configurações (Sua versão Local) */}
           <Route

@@ -5,6 +5,28 @@
  * Ficheiro centralizado para interfaces de dados.
  */
 
+export const API_BASE_URL = "http://localhost:8000";
+
+// ===================================
+// SalasPage.tsx TIPOS
+// ===================================
+
+export interface Sala {
+  id: number;
+  codigo_sala: number;
+  tipo_sala: string;
+  ativada: boolean;
+  sala_ativada?: boolean;
+  limite_usuarios: number;
+  descricao_sala: string;
+  imagem: string;
+}
+
+export interface RoomType {
+  id: number;
+  nome: string;
+}
+
 // ===================================
 // SolicitacoesPage.tsx TIPOS (US-08)
 // ===================================
