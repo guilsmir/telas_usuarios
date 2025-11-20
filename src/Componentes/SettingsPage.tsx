@@ -1,233 +1,172 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-// Interface para as props que o App.tsx vai passar
+declare const process: any;
+
 interface SettingsPageProps {
   onLogout: () => void;
 }
 
-/**
- * Componente que consolida:
- * US-12: Configurações Pessoais
- * US-13: Configurações do Sistema
- * US-11: Ação de Logout
- *  'useState' local para controlar os formulários.
- * A lógica de salvar (backend) está simulada com 'alert()'.
- */
 const SettingsPage: React.FC<SettingsPageProps> = ({ onLogout }) => {
-  // --- Estado para US-12 (Configurações Pessoais) ---
-  const [timezone, setTimezone] = useState("America/Sao_Paulo");
-  const [defaultView, setDefaultView] = useState("dayGridMonth");
-  const [notifyOnApproval, setNotifyOnApproval] = useState(true);
-  const [notifyOnDenial, setNotifyOnDenial] = useState(true);
+  const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [statusMessage, setStatusMessage] = useState<string>("Verificando conexão...");
 
-  // --- Estado para US-13 (Configurações do Sistema) ---
-  // Estes são mocks; o backend forneceria os valores reais.
-  const [defaultOpen, setDefaultOpen] = useState("08:00");
-  const [defaultClose, setDefaultClose] = useState("22:00");
-  const [semesterStart, setSemesterStart] = useState("2025-01-20");
-  const [semesterEnd, setSemesterEnd] = useState("2025-06-30");
-  const [approvalTemplate, setApprovalTemplate] = useState(
-    "Sua reserva para [SALA] no dia [DATA] foi APROVADA."
-  );
+  const API_BASE_URL = (typeof process !== 'undefined' && process.env?.REACT_APP_API_BASE_URL) || "http://localhost:8000";
 
-  /**
-   * Simula o salvamento das preferências pessoais (US-12).
+  useEffect(() => {
+    checkGoogleStatus();
+  }, []);
 
-   */
-  const handleSavePersonalSettings = (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = { timezone, defaultView, notifyOnApproval, notifyOnDenial };
-    console.log("Mock: Enviando Config. Pessoais:", payload);
-    alert("Configurações pessoais salvas (simulação)!");
-    // Ex: await fetch('/api/user/settings', { method: 'POST', body: JSON.stringify(payload) });
+  const getAuthHeaders = (): Record<string, string> => {
+    const token = localStorage.getItem("access_token");
+    return token ? { "Authorization": `Bearer ${token}` } : {};
   };
 
-  /**
-   * Simula o salvamento das configurações do sistema (US-13).
-   */
-  const handleSaveSystemSettings = (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = {
-      defaultOpen,
-      defaultClose,
-      semesterStart,
-      semesterEnd,
-      approvalTemplate,
-    };
-    console.log("Mock: Enviando Config. Sistema:", payload);
-    alert("Configurações do sistema salvas (simulação)!");
-    // Ex: await fetch('/api/system/settings', { method: 'POST', body: JSON.stringify(payload) });
+  const checkGoogleStatus = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/google/status`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(), 
+        } as HeadersInit,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Status Google:", data); 
+        const isConnected = 
+            data === true || 
+            data?.connected === true || 
+            data === "connected" || 
+            (typeof data === 'string' && data.includes("success")); 
+        
+        setIsGoogleConnected(isConnected);
+        setStatusMessage(isConnected ? "Sua conta Google está vinculada." : "Nenhuma conta vinculada.");
+      } else {
+        if (response.status === 401) {
+            setStatusMessage("Sessão expirada. Faça login novamente.");
+        } else {
+            setIsGoogleConnected(false);
+            setStatusMessage("Não conectado.");
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao verificar status:", error);
+      setStatusMessage("Não foi possível verificar o status.");
+    }
+  };
+
+  const handleConnectGoogle = async () => {
+    setIsLoading(true);
+    try {
+      console.log("Iniciando conexão com Google...");
+      
+      const response = await fetch(`${API_BASE_URL}/google/connect`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        } as HeadersInit,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Resposta BRUTA da API:", data);
+
+        let redirectUrl = "";
+
+        if (typeof data === 'string') {
+            redirectUrl = data;
+        } else if (typeof data === 'object' && data !== null) {
+            redirectUrl = data.url || data.authorization_url || data.auth_url || data.redirect_url || data.link || "";
+        }
+
+        if (redirectUrl && redirectUrl.startsWith("http")) {
+            console.log("Redirecionando para:", redirectUrl);
+            window.location.href = redirectUrl;
+        } else {
+            console.error("URL não encontrada no objeto:", data);
+            alert(`A API respondeu, mas não achamos o link. \n\nO que chegou foi:\n${JSON.stringify(data, null, 2)}`);
+        }
+
+      } else {
+        if (response.status === 401) {
+            alert("Sessão expirada. Faça login novamente.");
+            onLogout();
+        } else {
+            alert(`Erro na API: ${response.status}`);
+        }
+      }
+    } catch (error) {
+      console.error("Erro de conexão:", error);
+      alert("Erro de comunicação com o servidor.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="p-4" style={{ maxWidth: "900px", margin: "0 auto" }}>
-      <h2 className="mb-4">Configurações</h2>
-
-      {/* --- Card para US-12: Configurações Pessoais --- */}
-      <div className="card mb-4">
-        <h5 className="card-header">
-          <i className="bi bi-person-fill me-2"></i>
-          Configurações Pessoais
+    <div className="p-4" style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <h2 className="mb-4">Configurações da Conta</h2>
+      <div className="card mb-4 shadow-sm">
+        <h5 className="card-header bg-white">
+          <i className="bi bi-google me-2 text-primary"></i>
+          Integração Google Calendar
         </h5>
-        <div className="card-body">
-          <form onSubmit={handleSavePersonalSettings}>
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label htmlFor="timezone" className="form-label">
-                  Fuso Horário
-                </label>
-                <select
-                  id="timezone"
-                  className="form-select"
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                >
-                  <option value="America/Sao_Paulo">São Paulo (BRT)</option>
-                  <option value="America/Manaus">Manaus (AMT)</option>
-                  <option value="UTC">UTC</option>
-                </select>
+        <div className="card-body text-center py-5">
+          <div className="mb-4">
+            {isGoogleConnected ? (
+              <div className="text-success">
+                <i className="bi bi-check-circle-fill" style={{ fontSize: "4rem" }}></i>
+                <h4 className="mt-3">Conectado</h4>
+                <p className="text-muted">{statusMessage}</p>
               </div>
-              <div className="col-md-6 mb-3">
-                <label htmlFor="defaultView" className="form-label">
-                  Visualização Padrão do Calendário
-                </label>
-                <select
-                  id="defaultView"
-                  className="form-select"
-                  value={defaultView}
-                  onChange={(e) => setDefaultView(e.target.value)}
-                >
-                  <option value="dayGridMonth">Mês</option>
-                  <option value="timeGridWeek">Semana</option>
-                  <option value="timeGridDay">Dia</option>
-                </select>
+            ) : (
+              <div className="text-secondary">
+                <i className="bi bi-cloud-slash" style={{ fontSize: "4rem" }}></i>
+                <h4 className="mt-3">Desconectado</h4>
+                <p className="text-muted">Conecte sua conta para sincronizar as reservas automaticamente.</p>
               </div>
-            </div>
-
-            <label className="form-label">Preferências de Notificação</label>
-            <div className="form-check form-switch">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="notifyApproval"
-                checked={notifyOnApproval}
-                onChange={(e) => setNotifyOnApproval(e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="notifyApproval">
-                Receber email quando minha solicitação for APROVADA
-              </label>
-            </div>
-            <div className="form-check form-switch">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="notifyDenial"
-                checked={notifyOnDenial}
-                onChange={(e) => setNotifyOnDenial(e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="notifyDenial">
-                Receber email quando minha solicitação for NEGADA
-              </label>
-            </div>
-
-            <hr />
-            <button type="submit" className="btn btn-primary">
-              <i className="bi bi-save me-2"></i>
-              Salvar minhas Preferências
+            )}
+          </div>
+          {!isGoogleConnected ? (
+            <button 
+              className="btn btn-primary btn-lg" 
+              onClick={handleConnectGoogle}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Redirecionando...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-google me-2"></i>
+                  Conectar Conta Google
+                </>
+              )}
             </button>
-          </form>
+          ) : (
+            <div className="alert alert-success d-inline-block px-4">
+                <i className="bi bi-shield-check me-2"></i>
+                Sincronização Ativa
+            </div>
+          )}
         </div>
       </div>
-
-      {/* --- Card para US-13: Configurações do Sistema --- */}
-      {/* (Nota: Na implementação real, esta div inteira seria oculta se o usuário não fosse Admin) */}
-      <div className="card mb-4">
-        <h5 className="card-header bg-light">
-          <i className="bi bi-sliders me-2"></i>
-          Configurações do Sistema
-        </h5>
-        <div className="card-body">
-          <form onSubmit={handleSaveSystemSettings}>
-            <div className="row">
-              <label className="form-label">
-                Horário Padrão de Abertura do Sistema
-              </label>
-              <div className="col-md-6 mb-3">
-                <div className="input-group">
-                  <span className="input-group-text">Abre às</span>
-                  <input
-                    type="time"
-                    className="form-control"
-                    value={defaultOpen}
-                    onChange={(e) => setDefaultOpen(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="col-md-6 mb-3">
-                <div className="input-group">
-                  <span className="input-group-text">Fecha às</span>
-                  <input
-                    type="time"
-                    className="form-control"
-                    value={defaultClose}
-                    onChange={(e) => setDefaultClose(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <label className="form-label">Definições do Semestre Atual</label>
-              <div className="col-md-6 mb-3">
-                <div className="input-group">
-                  <span className="input-group-text">Início</span>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={semesterStart}
-                    onChange={(e) => setSemesterStart(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="col-md-6 mb-3">
-                <div className="input-group">
-                  <span className="input-group-text">Fim</span>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={semesterEnd}
-                    onChange={(e) => setSemesterEnd(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="mb-3">
-              <label htmlFor="emailTemplate" className="form-label">
-                Template de Email (Aprovação)
-              </label>
-              <textarea
-                id="emailTemplate"
-                className="form-control"
-                rows={3}
-                value={approvalTemplate}
-                onChange={(e) => setApprovalTemplate(e.target.value)}
-              ></textarea>
-            </div>
-            <hr />
-            <button type="submit" className="btn btn-warning">
-              <i className="bi bi-save me-2"></i>
-              Salvar Configurações do Sistema
-            </button>
-          </form>
-        </div>
-      </div>
-
-      {/* --- Card para US-11: Logout --- */}
-      <div className="card border-danger">
-        <h5 className="card-header text-danger">
-          <i className="bi bi-box-arrow-right me-2"></i>
-          Encerrar Sessão
-        </h5>
-        <div className="card-body">
+      <div className="card border-danger shadow-sm mt-5">
+        <div className="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h5 className="text-danger mb-1">
+                <i className="bi bi-box-arrow-right me-2"></i>
+                Encerrar Sessão
+            </h5>
+            <p className="text-muted mb-0 small">Deslogar do sistema de reservas.</p>
+          </div>
           <button className="btn btn-danger" onClick={onLogout}>
             Sair (Logout)
           </button>
