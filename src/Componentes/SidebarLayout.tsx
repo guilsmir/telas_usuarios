@@ -1,4 +1,3 @@
-// src/Componentes/SidebarLayout.tsx
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { type MenuLink } from "../types/api";
 import { type MouseEvent } from "react";
@@ -7,36 +6,24 @@ interface SidebarLayoutProps {
   menuItems: MenuLink[];
 }
 
-/**
- * SidebarLayout
- * - utiliza NavLink para comportamento SPA normal
- * - intercepta clique: se estivermos na rota do calendário ("/")
- *   e o usuário clicar para ir a outra rota, forçamos navegação completa
- *   via window.location.href (garante reload).
- */
 export default function SidebarLayout({ menuItems }: SidebarLayoutProps) {
   const { pathname } = useLocation();
 
-  // Função que intercepta clique nos itens do menu
   const handleMenuClick = (
     e: MouseEvent<HTMLAnchorElement>,
     itemPath: string
   ) => {
     const calendarPath = "/";
 
-    // Se sair do calendário, força recarregamento
     if (pathname === calendarPath && itemPath !== calendarPath) {
       e.preventDefault();
 
-      // Evita flash de tela e garante redirecionamento suave
       setTimeout(() => {
         window.location.href = itemPath;
       }, 0);
 
       return;
     }
-    // Caso contrário, deixamos o NavLink controlar a navegação (SPA)
-    // Não chamamos preventDefault()
   };
 
   return (
@@ -62,7 +49,6 @@ export default function SidebarLayout({ menuItems }: SidebarLayoutProps) {
         <ul className="nav nav-pills flex-column mb-auto">
           {menuItems.map((item) => (
             <li className="nav-item" key={item.path}>
-              {/* NavLink usado para active class; onClick intercepta caso precise forçar reload */}
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>

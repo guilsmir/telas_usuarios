@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
-import { API_BASE_URL, type Sala, type RoomType } from "../types/api";
-
-import "../App.css";
-import "../Auth.css";
+import React, { useState, useEffect } from "react";
+import { api } from "../services/api";
+import { type Sala, type RoomType } from "../types/api";
 
 function SalasPage() {
   const [salas, setSalas] = useState<Sala[]>([]);
@@ -23,22 +21,21 @@ function SalasPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [roomsRes, typesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/rooms/`),
-        fetch(`${API_BASE_URL}/room-types/`)
+      const [salasData, typesData] = await Promise.all([
+        api.getSalasRaw(),
+        api.getRoomTypes()
       ]);
 
-      if (!roomsRes.ok || !typesRes.ok) {
-        throw new Error("Erro ao buscar dados do servidor.");
-      }
-
-      const roomsData = await roomsRes.json();
-      const typesData = await typesRes.json();
-
-      setSalas(roomsData);
+      setSalas(salasData);
       setRoomTypes(typesData);
+      setError(null);
+
     } catch (err: any) {
-      setError(err.message);
+      if (String(err.message).includes("401")) {
+        setError("Sessão expirada. Por favor, faça login novamente.");
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -77,31 +74,13 @@ function SalasPage() {
     e.preventDefault();
     
     try {
-      const method = editSala ? "PUT" : "POST";
-      const url = editSala 
-        ? `${API_BASE_URL}/rooms/${editSala.id}`
-        : `${API_BASE_URL}/rooms/`;
-
-      const payload = {
-        ...formData,
-        sala_ativada: formData.ativada
-      };
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const errData = await response.json();
-        const msg = errData.detail ? JSON.stringify(errData.detail) : "Erro ao salvar.";
-        throw new Error(msg);
+      if (editSala) {
+        await api.updateSala(editSala.id, formData);
+      } else {
+        await api.createSala(formData);
       }
 
-      await fetchData();
+      await fetchData(); 
       closeModals();
     } catch (err: any) {
       alert(`Erro: ${err.message}`);
@@ -112,14 +91,7 @@ function SalasPage() {
     if (!deleteSala) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/rooms/${deleteSala.id}`, {
-        method: "DELETE"
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao excluir sala.");
-      }
-
+      await api.deleteSala(deleteSala.id);
       setSalas(salas.filter(s => s.id !== deleteSala.id));
       closeModals();
     } catch (err: any) {
@@ -232,7 +204,6 @@ function SalasPage() {
         </div>
       </div>
 
-      {/* Modal Criar/Editar Sala */}
       {(isCreateModalOpen || editSala) && (
         <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex={-1}>
           <div className="modal-dialog modal-dialog-centered">
@@ -327,7 +298,6 @@ function SalasPage() {
         </div>
       )}
 
-      {/* Modal Excluir Sala */}
       {deleteSala && (
         <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex={-1}>
           <div className="modal-dialog modal-dialog-centered">

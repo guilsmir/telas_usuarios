@@ -1,16 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-
-export type Person = {
-  id: string;
-  name: string;
-  grade?: string;
-  avatar?: string;
-};
-
-export type Room = {
-  id: string;
-  name: string;
-};
+import type { Person, Room } from "../types/api";
 
 export type SidebarFiltersProps = {
   people?: Person[];
@@ -22,7 +11,6 @@ export type SidebarFiltersProps = {
   maxHeight?: string;
 };
 
-// Componente
 export default function SidebarFilters({
   people = [],
   rooms = [],
@@ -69,7 +57,6 @@ export default function SidebarFilters({
     return rooms.filter((r) => r.name.toLowerCase().includes(q));
   }, [rooms, roomsQuery]);
 
-  // Efeito para notificar mudança de seleção automaticamente (com prevenção de loop)
   useEffect(() => {
     if (!isMounted.current) {
       isMounted.current = true;
@@ -101,7 +88,6 @@ export default function SidebarFilters({
     setRoomsQuery("");
   };
 
-  // Funções de Desseleção por ID (usadas nos chips)
   const deselectPerson = (id: string) => {
     setSelectedPeople((prev) => ({ ...prev, [id]: false }));
   };
@@ -173,21 +159,6 @@ export default function SidebarFilters({
               onClick={() => togglePerson(p.id)}
               style={{ cursor: "pointer" }}
             >
-              <div
-                className={`rounded-circle d-flex justify-content-center align-items-center me-3 bg-secondary text-white`}
-                style={{ width: "40px", height: "40px", flexShrink: 0 }}
-              >
-                {p.avatar ? (
-                  <img
-                    src={p.avatar}
-                    alt={p.name}
-                    className="w-100 h-100 rounded-circle"
-                  />
-                ) : (
-                  p.name.charAt(0)
-                )}
-              </div>
-
               <div className="flex-grow-1 me-2 overflow-hidden">
                 <div className="fw-bold text-dark text-truncate">{p.name}</div>
                 <small className={`text-muted d-block text-truncate`}>

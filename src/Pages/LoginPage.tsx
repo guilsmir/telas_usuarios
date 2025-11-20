@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-
-declare const process: any;
+import { api } from "../services/api";
 
 type LoginPageProps = {
   onLoginSuccess: () => void;
@@ -13,36 +12,13 @@ function LoginPage({ onLoginSuccess, onGoToRegister }: LoginPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const API_BASE_URL = (typeof process !== 'undefined' && process.env?.REACT_APP_API_BASE_URL) || "http://localhost:8000";
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      const formData = new URLSearchParams();
-      formData.append("username", email); 
-      formData.append("password", password);
-
-      const response = await fetch(`${API_BASE_URL}/auth/token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Falha ao realizar login. Verifique suas credenciais.");
-      }
-
-      const data = await response.json();
-
-      localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("isLogged", "true");
-
+      await api.login(email, password);
       onLoginSuccess();
 
     } catch (err: any) {

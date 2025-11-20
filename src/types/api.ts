@@ -1,15 +1,5 @@
-// src/types/api.ts
-
-/**
- * Definições de Tipos Comuns
- * Ficheiro centralizado para interfaces de dados.
- */
-
+declare const process: any;
 export const API_BASE_URL = "http://localhost:8000";
-
-// ===================================
-// SalasPage.tsx TIPOS
-// ===================================
 
 export interface Sala {
   id: number;
@@ -26,10 +16,6 @@ export interface RoomType {
   id: number;
   nome: string;
 }
-
-// ===================================
-// SolicitacoesPage.tsx TIPOS (US-08)
-// ===================================
 
 export interface ReservaItem {
   id_item: string; 
@@ -54,21 +40,12 @@ export interface SolicitacaoMestra {
   status_geral: 'pendente' | 'aprovado' | 'negado' | 'parcialmente aprovado';
 }
 
-// ===================================
-// SidebarLayout.tsx TIPOS
-// ===================================
-
 export interface MenuLink {
   path: string;
   label: string;
   icon: string; 
 }
 
-// ===================================
-// AuditPage.tsx TIPOS (US-11)
-// ===================================
-
-// CORREÇÃO: Substituído 'any' pela interface real.
 export interface FilterState { 
     actor: string; 
     action: string; 
@@ -89,3 +66,103 @@ export interface AuditEntry {
     comment: string | null;
     timestamp: string;
 }
+
+export interface MenuLink {
+  path: string;
+  label: string;
+  icon: string;
+}
+
+export interface Person {
+  id: string;
+  name: string;
+  email: string;
+  grade: string;
+}
+
+export interface Room {
+  id: string;
+  name: string;
+}
+
+export interface Sala {
+  id: number;
+  codigo_sala: number;
+  tipo_sala: string;
+  ativada: boolean;
+  limite_usuarios: number;
+  descricao_sala: string;
+  imagem: string;
+  sala_ativada?: boolean; 
+}
+
+export interface RoomType {
+  id: number;
+  nome: string;
+}
+
+export interface UsuarioAPI {
+  id: number;
+  nome: string;
+  email: string;
+  tipo_usuario: number;
+}
+
+export interface ScheduleItem {
+    id?: string;
+    roomId: string;
+    roomName: string;
+    data: string;
+    horaInicio: string;
+    horaFim: string;
+}
+
+export interface ReservationData {
+  id?: string;
+  nome: string;
+  email: string;
+  descricao?: string;
+  schedules: ScheduleItem[];
+}
+
+export interface ApiUser {
+  id: number;
+  nome: string;
+  email: string;
+  tipo_usuario: number;
+}
+
+export interface ApiRoom {
+  id: number;
+  codigo_sala: number;
+  descricao_sala: string;
+  tipo_sala: string;
+  sala_ativada?: boolean;
+  ativada?: boolean;
+}
+
+export interface BackendReservationPayload {
+  fk_usuario: number;
+  fk_sala: number;
+  dia_horario_inicio: string; 
+  dia_horario_saida: string;  
+  tipo: string;
+  uso: string;
+  justificativa: string;
+  oficio: string;
+}
+
+export interface UserPayload {
+  nome: string;
+  email: string;
+  tipo_usuario: number;
+  senha?: string; 
+}
+
+export interface ApiUser {
+  id: number;
+  nome: string;
+  email: string;
+  tipo_usuario: number;
+}
+
