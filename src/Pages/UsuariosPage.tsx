@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
-import { type ApiUser, type UserPayload } from "../types/api"
+import type { ApiUser, UserPayload } from "../Types/api"
 
 const TIPO_USUARIO_MAP: Record<number, string> = {
   1: "Aluno",
@@ -12,9 +12,11 @@ function UsuariosPage() {
   const [users, setUsers] = useState<ApiUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<ApiUser | null>(null);
   const [deleteUser, setDeleteUser] = useState<ApiUser | null>(null);
+
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
@@ -78,7 +80,7 @@ function UsuariosPage() {
       const payload: UserPayload = {
         nome: formData.nome,
         email: formData.email,
-        tipo_usuario: Number(formData.tipo_usuario),
+        tipo_usuario: editUser ? editUser.tipo_usuario : Number(formData.tipo_usuario),
       };
 
       if (!editUser || formData.senha) {
@@ -100,7 +102,6 @@ function UsuariosPage() {
 
   const confirmDelete = async () => {
     if (!deleteUser) return;
-
     try {
       await api.deleteUser(deleteUser.id);
       setUsers(users.filter(u => u.id !== deleteUser.id));
@@ -132,7 +133,7 @@ function UsuariosPage() {
         <div className="col-md-4">
           <div className="card shadow-sm h-100">
             <div className="card-body text-center">
-              <div className="text-muted small mb-2">Total de Usuários</div>
+              <div className="text-muted small mb-2">Total</div>
               <div className="h3 mb-0 fw-bold">{users.length}</div>
             </div>
           </div>
@@ -140,9 +141,9 @@ function UsuariosPage() {
         <div className="col-md-4">
           <div className="card shadow-sm h-100">
             <div className="card-body text-center">
-              <div className="text-muted small mb-2">Administradores</div>
-              <div className="h3 mb-0 fw-bold text-warning">
-                {users.filter(u => u.tipo_usuario === 3).length}
+              <div className="text-muted small mb-2">Professores/Alunos</div>
+              <div className="h3 mb-0 fw-bold text-info">
+                {users.filter(u => u.tipo_usuario !== 3).length}
               </div>
             </div>
           </div>
@@ -150,9 +151,9 @@ function UsuariosPage() {
         <div className="col-md-4">
           <div className="card shadow-sm h-100">
             <div className="card-body text-center">
-              <div className="text-muted small mb-2">Solicitadores</div>
-              <div className="h3 mb-0 fw-bold text-info">
-                {users.filter(u => u.tipo_usuario !== 3).length}
+              <div className="text-muted small mb-2">Admin</div>
+              <div className="h3 mb-0 fw-bold text-warning">
+                {users.filter(u => u.tipo_usuario === 3).length}
               </div>
             </div>
           </div>
@@ -194,13 +195,6 @@ function UsuariosPage() {
                     </td>
                   </tr>
                 ))}
-                {users.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="text-center py-5 text-muted">
-                      Nenhum usuário encontrado.
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
@@ -240,7 +234,7 @@ function UsuariosPage() {
                     />
                   </div>
 
-                  {!editUser && (
+                  {!editUser ? (
                     <div className="mb-3">
                       <label className="form-label">Papel</label>
                       <select 
@@ -253,6 +247,17 @@ function UsuariosPage() {
                         <option value="2">Professor</option>
                         <option value="3">Administrador</option>
                       </select>
+                    </div>
+                  ) : (
+                    <div className="mb-3">
+                        <label className="form-label text-muted">Papel</label>
+                        <input 
+                            type="text" 
+                            className="form-control bg-light" 
+                            value={TIPO_USUARIO_MAP[formData.tipo_usuario]} 
+                            disabled 
+                        />
+                        <small className="text-muted">O papel do usuário não pode ser alterado.</small>
                     </div>
                   )}
                   
@@ -293,7 +298,7 @@ function UsuariosPage() {
                 <p>Tem certeza que deseja excluir o usuário <b>{deleteUser.nome}</b>?</p>
                 <div className="alert alert-warning mb-0 small">
                   <i className="bi bi-exclamation-triangle me-2"></i>
-                  Esta ação é irreversível. O usuário perderá o acesso imediatamente.
+                  Esta ação é irreversível.
                 </div>
               </div>
               <div className="modal-footer">

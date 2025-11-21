@@ -11,7 +11,7 @@ import UsuariosPage from "./Pages/UsuariosPage";
 import CalendarioPage from "./Pages/CalendarioPage";
 import SidebarLayout from "./Componentes/SidebarLayout";
 import { api } from "./services/api"; 
-import type { MenuLink, Person, Room } from "./types/api";
+import type { MenuLink, Person, Room } from "./Types/api";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(

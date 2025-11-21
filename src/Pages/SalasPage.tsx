@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
-import { type Sala, type RoomType } from "../types/api";
+import { type Sala, type RoomType } from "../Types/api";
 
 function SalasPage() {
   const [salas, setSalas] = useState<Sala[]>([]);

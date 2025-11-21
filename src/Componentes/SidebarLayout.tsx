@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { type MenuLink } from "../types/api";
+import { type MenuLink } from "../Types/api";
 import { type MouseEvent } from "react";
 
 interface SidebarLayoutProps {

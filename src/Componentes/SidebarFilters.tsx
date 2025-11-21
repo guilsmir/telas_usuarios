@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import type { Person, Room } from "../types/api";
+import type { Person, Room } from "../Types/api";
 
 export type SidebarFiltersProps = {
   people?: Person[];

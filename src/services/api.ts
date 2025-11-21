@@ -7,7 +7,7 @@ import type {
   UserPayload,
   Sala,
   RoomType
-} from "../types/api";
+} from "../Types/api";
 
 declare const process: any;
 const API_URL = (typeof process !== 'undefined' && process.env?.REACT_APP_API_BASE_URL) || "http://localhost:8000";

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import Calendario from "../Componentes/Calendario";
 import ModalReserva from "../Componentes/ModalReserva";
 import SidebarFilters from "../Componentes/SidebarFilters";
-import type { Person, Room, ReservationData, BackendReservationPayload } from "../types/api";
+import type { Person, Room, ReservationData, BackendReservationPayload } from "../Types/api";
 import { api } from "../services/api";
 
 interface CalendarioPageProps {

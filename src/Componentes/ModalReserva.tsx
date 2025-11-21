@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type { Person, Room, ReservationData } from "../types/api";
+import type { Person, Room, ReservationData } from "../Types/api";
 
 interface ModalReservaProps {
   show: boolean;
