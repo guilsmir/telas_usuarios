@@ -68,3 +68,49 @@ html, body, #root {
 .fc-scroller::-webkit-scrollbar {
   display: none;
 }
+
+/* Usuarios page (card + add button) */
+.usuarios-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 620px; 
+  margin: 12px 0;
+}
+
+.btn-add-user {
+  background: #2F63F6; 
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 12px 30px rgba(47,99,246,0.18);
+  cursor: pointer;
+}
+
+.btn-add-user:active {
+  transform: translateY(1px);
+}
+
+.btn-add-user .bi {
+  color: #fff;
+  font-size: 18px;
+}
+
+.usuarios-cards { display: inline-block; }
+
+
+.action-btn .bi {
+  color: inherit; /* icon uses the button color (black) */
+  font-size: 18px;
+}
+
+.action-btn:hover {
+  background: #ffffff;
+  filter: brightness(0.98);
+}
+

@@ -32,37 +32,59 @@ const mockUsers: Usuario[] = [
 ];
 
 function UsuariosPage() {
-  const [users] = useState<Usuario[]>(mockUsers);
+  const [users, setUsers] = useState<Usuario[]>(mockUsers);
   const [editUser, setEditUser] = useState<Usuario | null>(null);
   const [deleteUser, setDeleteUser] = useState<Usuario | null>(null);
-  const [showDeleteBlocked, setShowDeleteBlocked] = useState(false);
+  const [deleteBlockedUser, setDeleteBlockedUser] = useState<Usuario | null>(null);
+  const [newUser, setNewUser] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
 
   const handleEdit = (user: Usuario) => setEditUser(user);
   const handleDelete = (user: Usuario) => {
-    if (user.possuiReservas) setShowDeleteBlocked(true);
+    if (user.possuiReservas) setDeleteBlockedUser(user);
     else setDeleteUser(user);
   };
   const closeModals = () => {
     setEditUser(null);
     setDeleteUser(null);
-    setShowDeleteBlocked(false);
+    setDeleteBlockedUser(null);
+    setNewUser(false);
+    setNewName("");
+    setNewEmail("");
+  };
+
+  const handleCreateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const nextId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1;
+    const created: Usuario = {
+      id: nextId,
+      nome: newName || "Novo Usuário",
+      email: newEmail || "",
+      curso: "",
+      papel: "Solicitador",
+      possuiReservas: false,
+    };
+    setUsers([created, ...users]);
+    closeModals();
   };
 
   return (
     <div className="usuarios-dashboard">
       <h2>Gerenciamento de Usuários</h2>
-      <div className="usuarios-cards">
-        <div className="usuarios-card">
-          <div>Total de Usuários</div>
-          <div>{users.length}</div>
+      <div className="usuarios-header">
+        <div className="usuarios-cards">
+          <div className="usuarios-card">
+            <div>Total de Usuários</div>
+            <div>{users.length}</div>
+          </div>
         </div>
-        <div className="usuarios-card">
-          <div>Administradores</div>
-          <div>{users.filter((u: Usuario) => u.papel === "adm").length}</div>
-        </div>
-        <div className="usuarios-card">
-          <div>Solicitador</div>
-          <div>{users.filter((u: Usuario) => u.papel === "Solicitador").length}</div>
+
+        <div>
+          <button className="btn-add-user" onClick={() => setNewUser(true)}>
+            <i className="bi bi-plus-lg"></i>
+            Novo Usuário
+          </button>
         </div>
       </div>
       <div className="usuarios-table-container">
@@ -71,8 +93,6 @@ function UsuariosPage() {
             <tr>
               <th>Nome</th>
               <th>Email</th>
-              <th>Curso</th>
-              <th>Papel</th>
               <th>Ação</th>
             </tr>
           </thead>
@@ -81,13 +101,11 @@ function UsuariosPage() {
               <tr key={user.id}>
                 <td>{user.nome}</td>
                 <td>{user.email}</td>
-                <td>{user.curso}</td>
-                <td>{user.papel}</td>
                 <td>
-                  <button onClick={() => handleEdit(user)} title="Editar">
+                  <button className="action-btn" onClick={() => handleEdit(user)} title="Editar">
                     <i className="bi bi-pencil"></i>
                   </button>
-                  <button onClick={() => handleDelete(user)} title="Excluir">
+                  <button className="action-btn" onClick={() => handleDelete(user)} title="Excluir">
                     <i className="bi bi-trash"></i>
                   </button>
                 </td>
@@ -108,13 +126,6 @@ function UsuariosPage() {
               <input type="text" defaultValue={editUser.nome} />
               <label>Email</label>
               <input type="email" defaultValue={editUser.email} />
-              <label>Curso</label>
-              <input type="text" defaultValue={editUser.curso} />
-              <label>Papel</label>
-              <select defaultValue={editUser.papel}>
-                <option value="adm">Administrador</option>
-                <option value="Solicitador">Solicitador</option>
-              </select>
               <div className="usuarios-modal-actions">
                 <button type="button" onClick={closeModals}>Cancelar</button>
                 <button type="submit" className="btn-primary">Salvar Alterações</button>
@@ -143,12 +154,12 @@ function UsuariosPage() {
       )}
 
       {/* Modal Exclusão Bloqueada */}
-      {showDeleteBlocked && (
+      {deleteBlockedUser && (
         <div className="usuarios-modal-bg">
           <div className="usuarios-modal">
             <button className="close-btn" onClick={closeModals}>&times;</button>
             <h3>Confirmar exclusão</h3>
-            <p>Tem certeza que deseja excluir o usuário <b>Jonas Nascimento</b>?</p>
+            <p>Tem certeza que deseja excluir o usuário <b>{deleteBlockedUser.nome}</b>?</p>
             <p className="usuarios-modal-warning">
               Este usuário possui reservas ativas. Por favor, realoque ou cancele essas reservas primeiro.
             </p>
@@ -156,6 +167,26 @@ function UsuariosPage() {
               <button onClick={closeModals}>Cancelar</button>
               <button className="btn-primary">Ir para as reservas</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Novo Usuário */}
+      {newUser && (
+        <div className="usuarios-modal-bg">
+          <div className="usuarios-modal">
+            <button className="close-btn" onClick={closeModals}>&times;</button>
+            <h3>Novo Usuário</h3>
+            <form onSubmit={handleCreateSubmit}>
+              <label>Nome Completo</label>
+              <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} />
+              <label>Email</label>
+              <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+              <div className="usuarios-modal-actions">
+                <button type="button" onClick={closeModals}>Cancelar</button>
+                <button type="submit" className="btn-primary">Criar Usuário</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

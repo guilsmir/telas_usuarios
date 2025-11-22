@@ -302,7 +302,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  background: #222;
+  background: #ffffff;
   border-radius: 0 8px 8px 0;
   justify-content: flex-start;
   padding: 0 12px;
@@ -312,7 +312,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #fff;
+  color: #000000;
   font-size: 1.2rem;
   padding: 8px 8px;
   border-radius: 6px;
