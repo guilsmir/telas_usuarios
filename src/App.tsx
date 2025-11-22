@@ -19,9 +19,6 @@ import ModalReserva, {
   type Room,
 } from "./Componentes/ModalReserva";
 import SidebarFilters from "./Componentes/SidebarFilters";
-
-import AuditPage from "./Componentes/AuditPage";
-import SolicitacoesPage from "./Componentes/SolicitacoesPage";
 import SidebarLayout from "./Componentes/SidebarLayout";
 
 import { type MenuLink } from "./types/api";
@@ -202,15 +199,11 @@ export default function App() {
   // ===================================================================
   const adminMenuItems: MenuLink[] = [
     { path: "/", label: "Calendário", icon: "bi-calendar-date" },
-    { path: "/solicitacoes", label: "Solicitações", icon: "bi-inbox" },
+
     // Item vindo do GitHub
     { path: "/usuarios", label: "Usuários", icon: "bi-people" },
     { path: "/salas", label: "Salas", icon: "bi-door-open" },
-    {
-      path: "/auditoria",
-      label: "Registros de Auditoria",
-      icon: "bi-journal-check",
-    },
+
     // Item vindo da sua versão Local
     {
       path: "/configuracoes",
@@ -268,16 +261,9 @@ export default function App() {
             path="/"
             element={<CalendarioPage people={mockPeople} rooms={rooms} />}
           />
-
-          {/* Rota de Solicitações */}
-          <Route path="/solicitacoes" element={<SolicitacoesPage />} />
-
-          {/* Rota de Auditoria */}
-          <Route path="/auditoria" element={<AuditPage />} />
-
           {/* [MERGE] Rota de Usuários (Vinda do GitHub) */}
           <Route path="/usuarios" element={<UsuariosPage />} />
-          
+
           <Route path="/salas" element={<SalasPage />} />
 
           {/* [MERGE] Rota de Configurações (Sua versão Local) */}

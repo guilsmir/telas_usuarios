@@ -269,14 +269,53 @@ export default function ModalReserva({
     e.preventDefault();
     setWasValidated(true);
     if (!nome || !email || schedules.length === 0) return;
-    const payload: ReservationData = {
-      id: initialData?.id,
-      nome,
-      email,
-      descricao,
-      schedules,
-    };
-    onSubmit(payload);
+
+    // 1. Encontrar o ID do usuário
+    const userFound = people.find((p) => p.email === email);
+    const fkUsuario = userFound ? Number(userFound.id) : 0;
+
+    // 2. Transformar itens para o formato do Backend
+    const payloadBackend = schedules.map((item) => {
+      const dtInicio = new Date(`${item.data}T${item.horaInicio}:00`);
+      const dtFim = new Date(`${item.data}T${item.horaFim}:00`);
+
+      // Regra RFC5545 básica
+      let rrule = "";
+      switch (item.recorrencia) {
+        case "diario":
+          rrule = "FREQ=DAILY;INTERVAL=1";
+          break;
+        case "semanal":
+          rrule = "FREQ=WEEKLY;INTERVAL=1";
+          break;
+        case "mensal":
+          rrule = "FREQ=MONTHLY;INTERVAL=1";
+          break;
+        case "anual":
+          rrule = "FREQ=YEARLY;INTERVAL=1";
+          break;
+        default:
+          rrule = "";
+      }
+
+      return {
+        fk_usuario: fkUsuario,
+        fk_sala: Number(item.roomId),
+        tipo: "Aula", // Ajuste conforme necessário
+        recurrency: rrule,
+        dia_horario_inicio: dtInicio.toISOString(),
+        dia_horario_saida: dtFim.toISOString(),
+        uso: descricao,
+        justificativa: descricao,
+        oficio: "",
+      };
+    });
+
+    console.log("Payload corrigido para o Back:", payloadBackend);
+
+    // Envia para o componente pai fazer o POST/PUT
+    // @ts-expect-error: O payload enviado para o backend difere da interface ReservationData, mas é o esperado pela API.
+    onSubmit(payloadBackend);
   };
 
   const isEditing = !!initialData?.id;
