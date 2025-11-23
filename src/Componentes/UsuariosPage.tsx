@@ -3,15 +3,6 @@ import { API_BASE_URL } from "../types/api";
 import "../App.css";
 import "../Auth.css";
 
-// Tipagem simplificada 
-type Usuario = {
-  id: number;
-  nome: string;
-  email: string;
-  tipo_usuario: number; // Mantido apenas para controle interno se necessário
-  possuiReservas: boolean;
-};
-
 function UsuariosPage() {
   const [users, setUsers] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(false);
