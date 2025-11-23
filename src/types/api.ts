@@ -89,3 +89,15 @@ export interface AuditEntry {
     comment: string | null;
     timestamp: string;
 }
+
+// ===================================
+// UsuariosPage.tsx TIPOS
+// ===================================
+
+type Usuario = {
+  id: number;
+  nome: string;
+  email: string;
+  tipo_usuario: number; 
+  possuiReservas: boolean;
+};
