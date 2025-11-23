@@ -94,7 +94,7 @@ export interface AuditEntry {
 // UsuariosPage.tsx TIPOS
 // ===================================
 
-type Usuario = {
+export interface Usuario = {
   id: number;
   nome: string;
   email: string;
