@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { API_BASE_URL } from "../types/api";
+import { API_BASE_URL, type Usuario } from "../types/api";
 import "../App.css";
 import "../Auth.css";
 
