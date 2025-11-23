@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../types/api";
 import "../App.css";
 import "../Auth.css";
-
-// Configuração da API
-const API_BASE_URL = "http://localhost:8000";
 
 // Tipagem simplificada 
 type Usuario = {
