@@ -28,9 +28,9 @@ function UsuariosPage() {
     };
   };
 
-  // --- CRUD Operations ---
+  // --- CRUD Operações ---
 
-  // 1. READ (Listar)
+  // 1. READ 
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -45,7 +45,7 @@ function UsuariosPage() {
           id: u.id,
           nome: u.nome,
           email: u.email,
-          tipo_usuario: u.tipo_usuario, // Guardamos, mas não mostramos na tela
+          tipo_usuario: u.tipo_usuario,
           possuiReservas: false 
         }));
         setUsers(formattedUsers);
@@ -63,7 +63,7 @@ function UsuariosPage() {
     fetchUsers();
   }, []);
 
-  // 2. CREATE (Criar)
+  // 2. CREATE 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -72,7 +72,7 @@ function UsuariosPage() {
         nome: newName,
         email: newEmail,
         senha: newPassword,
-        tipo_usuario: 1 // Cria sempre como usuário comum 
+        tipo_usuario: 1 
       };
 
       const response = await fetch(`${API_BASE_URL}/users/`, {
@@ -95,7 +95,7 @@ function UsuariosPage() {
     }
   };
 
-  // 3. UPDATE (Editar)
+  // 3. UPDATE 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editUser) return;
@@ -126,7 +126,7 @@ function UsuariosPage() {
     }
   };
 
-  // 4. DELETE (Remover)
+  // 4. DELETE 
   const confirmDelete = async () => {
     if (!deleteUser) return;
 
